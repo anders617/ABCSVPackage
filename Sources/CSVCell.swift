@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ABCSVCell:CustomStringConvertible {
+public enum CSVCell:CustomStringConvertible {
     case Header(contents:String)
     case Text(contents:String)
     case Integer(contents:Int)
@@ -51,7 +51,7 @@ public enum ABCSVCell:CustomStringConvertible {
         }
     }
     
-    public var header:ABCSVCell {
+    public var header:CSVCell {
         return .Header(contents: self.description)
     }
     

@@ -9,8 +9,12 @@
 import Foundation
 import ABMatrices
 
-public class CSV {
+public class CSV: CustomStringConvertible {
     internal(set) var content:ABMatrix<CSVCell>
+    
+    public var description: String {
+        return content.description
+    }
     
     public init() {
         content = ABMatrix(rowCount: 1, columnCount: 1, withValue: .Empty)
@@ -24,5 +28,4 @@ public class CSV {
         content = ABMatrix(rowCount: 1, columnCount: headers.count, withValue: .Empty)
         for columnNum in 0..<headers.count {content[0,columnNum] = headers[columnNum].header}
     }
-    
 }

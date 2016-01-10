@@ -63,9 +63,9 @@ public enum CSVCell:CustomStringConvertible {
     }
 }
 
-extension ABCSVCell: Equatable {}
+extension CSVCell: Equatable {}
 
-@warn_unused_result public func ==(lhs:ABCSVCell,_ rhs:ABCSVCell) -> Bool {
+@warn_unused_result public func ==(lhs:CSVCell,_ rhs:CSVCell) -> Bool {
     switch (lhs, rhs) {
     case (.Header(let lhsContent), .Header(let rhsContent)): return lhsContent==rhsContent
     case (.Text(let lhsContent), .Text(let rhsContent)): return lhsContent==rhsContent

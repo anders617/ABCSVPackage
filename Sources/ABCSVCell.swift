@@ -1,6 +1,6 @@
 import Foundation
 
-public enum CSVCell:CustomStringConvertible {
+public enum ABCSVCell:CustomStringConvertible {
     case Header(contents:String)
     case Text(contents:String)
     case Integer(contents:Int)
@@ -51,7 +51,7 @@ public enum CSVCell:CustomStringConvertible {
         }
     }
     
-    public var header:CSVCell {
+    public var header:ABCSVCell {
         return .Header(contents: self.description)
     }
     
@@ -63,9 +63,9 @@ public enum CSVCell:CustomStringConvertible {
     }
 }
 
-extension CSVCell: Equatable {}
+extension ABCSVCell: Equatable {}
 
-@warn_unused_result public func ==(lhs:CSVCell,_ rhs:CSVCell) -> Bool {
+@warn_unused_result public func ==(lhs:ABCSVCell,_ rhs:ABCSVCell) -> Bool {
     switch (lhs, rhs) {
     case (.Header(let lhsContent), .Header(let rhsContent)): return lhsContent==rhsContent
     case (.Text(let lhsContent), .Text(let rhsContent)): return lhsContent==rhsContent

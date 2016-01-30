@@ -12,20 +12,73 @@ import ABMatrices
 public class ABCSV:CustomStringConvertible {
     private(set) var content:ABMatrix<ABCSVCell>
     
-    public var valueSeparator = ","
-    public var rowSeparator = "\n"
+    private static let DEFAULT_VALUE_SEPARATOR = ","
+    private static let DEFAULT_ROW_SEPARATOR = "\n"
     
-    public init() {
-        content = ABMatrix(rowCount: 1, columnCount: 1, withValue: .Empty)
+    public var valueSeparator:String
+    public var rowSeparator:String
+    
+    public init(rowCount: Int = 1,
+        columnCount: Int = 1,
+        withValue value:ABCSVCell = .Empty,
+        withValueSeparator valueSeparator:String = ABCSV.DEFAULT_VALUE_SEPARATOR,
+        withRowSeparator rowSeparator:String = ABCSV.DEFAULT_ROW_SEPARATOR){
+            self.valueSeparator = valueSeparator
+            self.rowSeparator = rowSeparator
+            content = ABMatrix(rowCount: rowCount, columnCount: columnCount, withValue: value)
     }
     
-    public init(rowCount: Int, columnCount: Int, withValue value:ABCSVCell = .Empty) {
-        content = ABMatrix(rowCount: rowCount, columnCount: columnCount, withValue: value)
-    }
-    
-    public init(withHeaders headers: ABVector<ABCSVCell>) {
-        content = ABMatrix(rowCount: 1, columnCount: headers.count, withValue: .Empty)
+    public convenience init(withHeaders headers: ABVector<ABCSVCell>, rowCount:Int = 1){
+        self.init(rowCount:rowCount, columnCount: headers.count)
         for columnNum in 0..<headers.count {content[0,columnNum] = headers[columnNum].header}
+    }
+    
+    public convenience init(fromString string:String,
+        withValueSeparator valueSeparator:String = ABCSV.DEFAULT_VALUE_SEPARATOR,
+        withRowSeparator rowSeparator: String = ABCSV.DEFAULT_ROW_SEPARATOR) {
+            let rows = string.componentsSeparatedByString(rowSeparator)
+            let csv = rows
+                .map{$0.componentsSeparatedByString(valueSeparator)}
+                .map{$0.map{ABCSVCell(string: $0)}}
+            self.init(rowCount:csv.count,
+                columnCount: csv.maxElement{$0.count < $1.count}!.count,
+                withValueSeparator: valueSeparator,
+                withRowSeparator: rowSeparator)
+            for rowNum in 0..<csv.count {
+                for colNum in 0..<csv[rowNum].count {
+                    self[rowNum,colNum] = csv[rowNum][colNum]
+                }
+            }
+    }
+    
+    public convenience init(fromMatrix matrix: ABMatrix<ABCSVCell>,
+        withValueSeparator valueSeparator:String = ABCSV.DEFAULT_VALUE_SEPARATOR,
+        withRowSeparator rowSeparator:String = ABCSV.DEFAULT_ROW_SEPARATOR) {
+            self.init(rowCount:matrix.rowCount,
+                columnCount:matrix.columnCount,
+                withValueSeparator: valueSeparator,
+                withRowSeparator:rowSeparator)
+            let rowGenerator = matrix.row
+            for rowNum in 0..<matrix.rowCount {
+                self.insertRow(rowGenerator[rowNum], atIndex: rowNum)
+            }
+    }
+    
+    public static func fromText(text:String,
+        range:Range<String.Index>?,
+        withValueSeparator valueSeparator:String = ABCSV.DEFAULT_VALUE_SEPARATOR,
+        withRowSeparator rowSeparator:String = ABCSV.DEFAULT_ROW_SEPARATOR) -> [ABCSV] {
+            let ranges = text.rangesOfString(Regex.CSV.rawValue,
+                options: .RegularExpressionSearch,
+                range: range,
+                locale: nil)
+            var csvs:[ABCSV] = []
+            for range in ranges {
+                csvs += [
+                    ABCSV(fromString: text[range].stringByTrimmingCharactersInSet(NSCharacterSet.newlineCharacterSet()))
+                ]
+            }
+            return csvs
     }
     
     public var description:String {
@@ -79,5 +132,9 @@ public class ABCSV:CustomStringConvertible {
     
     public func appendRow(row: ABVector<ABCSVCell>) {
         content.appendRow(row)
+    }
+    
+    private enum Regex:String {
+        case CSV = "(?:(?:[^\n,]+,)+[^\n]+\n?)+"
     }
 }

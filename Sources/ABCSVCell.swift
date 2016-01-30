@@ -1,6 +1,7 @@
 import Foundation
 
 public enum ABCSVCell:CustomStringConvertible {
+    
     case Header(contents:String)
     case Text(contents:String)
     case Integer(contents:Int)
@@ -12,8 +13,8 @@ public enum ABCSVCell:CustomStringConvertible {
         //TODO:Better date parsing
         let cleanString = string.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         if let date = NSDateFormatter().dateFromString(cleanString) {self = .Date(contents: date)}
-        else if let decimal = Double(cleanString) {self = .Decimal(contents: decimal)}
         else if let integer = Int(cleanString) {self = .Integer(contents: integer)}
+        else if let decimal = Double(cleanString) {self = .Decimal(contents: decimal)}
         else if cleanString.characters.count > 0 {self = .Text(contents: cleanString)}
         else {self = .Empty}
     }
@@ -63,9 +64,49 @@ public enum ABCSVCell:CustomStringConvertible {
     }
 }
 
+extension ABCSVCell: IntegerLiteralConvertible {
+    public typealias IntegerLiteralType = Int
+    
+    public init(integerLiteral value: IntegerLiteralType) {
+        self = .Integer(contents: value)
+    }
+}
+
+extension ABCSVCell: FloatLiteralConvertible {
+    public typealias FloatLiteralType = Double
+    
+    public init(floatLiteral value: FloatLiteralType) {
+        self = .Decimal(contents: value)
+    }
+}
+
+extension ABCSVCell: StringLiteralConvertible {
+    public typealias StringLiteralType = String
+    public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
+    public typealias UnicodeScalarLiteralType = Character
+    
+    public init(stringLiteral value: StringLiteralType) {
+        self = .Text(contents: value)
+    }
+    
+    public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
+        self = .Text(contents: value)
+    }
+    
+    public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
+        self = .Text(contents: String(value))
+    }
+}
+
+extension ABCSVCell: NilLiteralConvertible {
+    public init(nilLiteral: ()) {
+        self = .Empty
+    }
+}
+
 extension ABCSVCell: Equatable {}
 
-@warn_unused_result public func ==(lhs:ABCSVCell,_ rhs:ABCSVCell) -> Bool {
+@warn_unused_result public func ==(lhs:ABCSVCell,rhs:ABCSVCell) -> Bool {
     switch (lhs, rhs) {
     case (.Header(let lhsContent), .Header(let rhsContent)): return lhsContent==rhsContent
     case (.Text(let lhsContent), .Text(let rhsContent)): return lhsContent==rhsContent

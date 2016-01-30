@@ -115,7 +115,7 @@ public class ABCSV:CustomStringConvertible {
     }
     
     public func removeColumnAtIndex(index:Int) {
-        content.removeColumnAtColumnIndex(index)
+        content.removeColumn(index)
     }
     
     public func appendColumn(column: ABVector<ABCSVCell>) {
@@ -127,7 +127,7 @@ public class ABCSV:CustomStringConvertible {
     }
     
     public func removeRowAtIndex(index:Int) {
-        content.removeRowAtRowIndex(index)
+        content.removeRow(index)
     }
     
     public func appendRow(row: ABVector<ABCSVCell>) {

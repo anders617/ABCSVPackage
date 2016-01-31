@@ -12,8 +12,8 @@ import ABMatrices
 public class ABCSV:CustomStringConvertible {
     private(set) var content:ABMatrix<ABCSVCell>
     
-    private static let DEFAULT_VALUE_SEPARATOR = ","
-    private static let DEFAULT_ROW_SEPARATOR = "\n"
+    private static let defaultValueSeparator = ","
+    private static let defaultRowSeparator = "\n"
     
     public var valueSeparator:String
     public var rowSeparator:String
@@ -21,8 +21,8 @@ public class ABCSV:CustomStringConvertible {
     public init(rowCount: Int = 1,
         columnCount: Int = 1,
         withValue value:ABCSVCell = .Empty,
-        withValueSeparator valueSeparator:String = ABCSV.DEFAULT_VALUE_SEPARATOR,
-        withRowSeparator rowSeparator:String = ABCSV.DEFAULT_ROW_SEPARATOR){
+        withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
+        withRowSeparator rowSeparator:String = ABCSV.defaultRowSeparator){
             self.valueSeparator = valueSeparator
             self.rowSeparator = rowSeparator
             content = ABMatrix(rowCount: rowCount, columnCount: columnCount, withValue: value)
@@ -34,8 +34,8 @@ public class ABCSV:CustomStringConvertible {
     }
     
     public convenience init(fromString string:String,
-        withValueSeparator valueSeparator:String = ABCSV.DEFAULT_VALUE_SEPARATOR,
-        withRowSeparator rowSeparator: String = ABCSV.DEFAULT_ROW_SEPARATOR) {
+        withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
+        withRowSeparator rowSeparator: String = ABCSV.defaultRowSeparator) {
             let rows = string.componentsSeparatedByString(rowSeparator)
             let csv = rows
                 .map{$0.componentsSeparatedByString(valueSeparator)}
@@ -52,22 +52,19 @@ public class ABCSV:CustomStringConvertible {
     }
     
     public convenience init(fromMatrix matrix: ABMatrix<ABCSVCell>,
-        withValueSeparator valueSeparator:String = ABCSV.DEFAULT_VALUE_SEPARATOR,
-        withRowSeparator rowSeparator:String = ABCSV.DEFAULT_ROW_SEPARATOR) {
+        withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
+        withRowSeparator rowSeparator:String = ABCSV.defaultRowSeparator) {
             self.init(rowCount:matrix.rowCount,
                 columnCount:matrix.columnCount,
                 withValueSeparator: valueSeparator,
                 withRowSeparator:rowSeparator)
-            let rowGenerator = matrix.row
-            for rowNum in 0..<matrix.rowCount {
-                self.insertRow(rowGenerator[rowNum], atIndex: rowNum)
-            }
+            content = matrix
     }
     
     public static func fromText(text:String,
         range:Range<String.Index>?,
-        withValueSeparator valueSeparator:String = ABCSV.DEFAULT_VALUE_SEPARATOR,
-        withRowSeparator rowSeparator:String = ABCSV.DEFAULT_ROW_SEPARATOR) -> [ABCSV] {
+        withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
+        withRowSeparator rowSeparator:String = ABCSV.defaultRowSeparator) -> [ABCSV] {
             let ranges = text.rangesOfString(Regex.CSV.rawValue,
                 options: .RegularExpressionSearch,
                 range: range,

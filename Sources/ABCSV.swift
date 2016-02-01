@@ -18,7 +18,8 @@ public class ABCSV:CustomStringConvertible {
     public var valueSeparator:String
     public var rowSeparator:String
     
-    public init(rowCount: Int = 1,
+    public init(
+        rowCount: Int = 1,
         columnCount: Int = 1,
         withValue value:ABCSVCell = .Empty,
         withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
@@ -33,7 +34,8 @@ public class ABCSV:CustomStringConvertible {
         for columnNum in 0..<headers.count {content[0,columnNum] = headers[columnNum].header}
     }
     
-    public convenience init(fromString string:String,
+    public convenience init(
+        fromString string:String,
         withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
         withRowSeparator rowSeparator: String = ABCSV.defaultRowSeparator) {
             let rows = string.componentsSeparatedByString(rowSeparator)
@@ -51,7 +53,8 @@ public class ABCSV:CustomStringConvertible {
             }
     }
     
-    public convenience init(fromMatrix matrix: ABMatrix<ABCSVCell>,
+    public convenience init(
+        fromMatrix matrix: ABMatrix<ABCSVCell>,
         withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
         withRowSeparator rowSeparator:String = ABCSV.defaultRowSeparator) {
             self.init(rowCount:matrix.rowCount,
@@ -61,7 +64,8 @@ public class ABCSV:CustomStringConvertible {
             content = matrix
     }
     
-    public static func fromText(text:String,
+    public static func fromText(
+        text:String,
         range:Range<String.Index>?,
         withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
         withRowSeparator rowSeparator:String = ABCSV.defaultRowSeparator) -> [ABCSV] {
@@ -76,6 +80,18 @@ public class ABCSV:CustomStringConvertible {
                 ]
             }
             return csvs
+    }
+    
+    public static func fromFile(
+        file:NSURL,
+        withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
+        withRowSeparator rowSeparator:String = ABCSV.defaultRowSeparator) -> [ABCSV] {
+            do {
+                let text = try String(contentsOfURL: file, encoding: NSUTF8StringEncoding)
+                return ABCSV.fromText(text, range: nil)
+            } catch {
+                return []
+            }
     }
     
     public var description:String {
@@ -107,8 +123,35 @@ public class ABCSV:CustomStringConvertible {
         }
     }
     
-    public func insertColumn(column: ABVector<ABCSVCell>, atIndex index:Int) {
-        content.insertColumn(column, atColumnIndex: index)
+    public subscript(row:Int) -> ABVector<ABCSVCell> {
+        get {
+            return content[row]
+        }
+        set {
+            content[row] = newValue
+        }
+    }
+    
+    public func column(columnNum:Int) -> ABVector<ABCSVCell> {
+        return content.column(columnNum)
+    }
+    
+    public func swapColumns(first:Int,_ second:Int) {
+        let temp = content.column(first)
+        content.setColumn(content.column(second), atIndex: first)
+        content.setColumn(temp, atIndex: second)
+    }
+    
+    public func setColumn(newColumn: ABVector<ABCSVCell>, atIndex columnNum:Int) {
+        content.setColumn(newColumn, atIndex: columnNum)
+    }
+    
+    public func setRow(newRow: ABVector<ABCSVCell>, atIndex rowNum:Int) {
+        content.setRow(newRow, atIndex: rowNum)
+    }
+    
+    public func insertColumn(newColumn: ABVector<ABCSVCell>, atIndex columnNum:Int) {
+        content.insertColumn(newColumn, atIndex: columnNum)
     }
     
     public func removeColumnAtIndex(index:Int) {
@@ -119,8 +162,18 @@ public class ABCSV:CustomStringConvertible {
         content.appendColumn(column)
     }
     
-    public func insertRow(row: ABVector<ABCSVCell>, atIndex index:Int) {
-        content.insertRow(row, atRowIndex: index)
+    public func row(rowNum:Int) -> ABVector<ABCSVCell> {
+        return content.row(rowNum)
+    }
+    
+    public func swapRows(first:Int,_ second:Int) {
+        let temp = content.row(first)
+        content.setRow(content.row(second), atIndex: first)
+        content.setRow(temp, atIndex: second)
+    }
+    
+    public func insertRow(newRow: ABVector<ABCSVCell>, atIndex rowNum:Int) {
+        content.insertRow(newRow, atIndex: rowNum)
     }
     
     public func removeRowAtIndex(index:Int) {

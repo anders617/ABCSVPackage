@@ -18,6 +18,14 @@ public class ABCSV:CustomStringConvertible {
     public var valueSeparator:String
     public var rowSeparator:String
     
+    public var columnCount:Int {
+        return content.columnCount
+    }
+    
+    public var rowCount:Int {
+        return content.rowCount
+    }
+    
     public init(
         rowCount: Int = 1,
         columnCount: Int = 1,

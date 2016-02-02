@@ -90,8 +90,17 @@ public class ABCSV:CustomStringConvertible {
                 let text = try String(contentsOfURL: file, encoding: NSUTF8StringEncoding)
                 return ABCSV.fromText(text, range: nil)
             } catch {
+                print(error)
                 return []
             }
+    }
+    
+    public static func fromFile(
+        path:String,
+        withValueSeparator valueSeparator:String = ABCSV.defaultValueSeparator,
+        withRowSeparator rowSeparator:String = ABCSV.defaultRowSeparator) -> [ABCSV] {
+            let file = NSURL(fileURLWithPath: path)
+            return ABCSV.fromFile(file)
     }
     
     public var description:String {

@@ -12,7 +12,8 @@ public enum ABCSVCell:CustomStringConvertible {
     public init(string:String) {
         //TODO:Better date parsing
         let cleanString = string.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-        if let date = NSDateFormatter().dateFromString(cleanString) {self = .Date(contents: date)}
+        if cleanString.isEmpty {self = .Empty}
+        else if let date = NSDateFormatter().dateFromString(cleanString) {self = .Date(contents: date)}
         else if let integer = Int(cleanString) {self = .Integer(contents: integer)}
         else if let decimal = Double(cleanString) {self = .Decimal(contents: decimal)}
         else if cleanString.characters.count > 0 {self = .Text(contents: cleanString)}

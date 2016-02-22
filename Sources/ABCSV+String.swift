@@ -9,23 +9,24 @@
 import Foundation
 
 extension String {
+    /**
+     Finds and returns all occurences of a given string in order, from lowest to highest indices.
+     */
     func rangesOfString(string:String, options:NSStringCompareOptions, range: Range<Index>?, locale: NSLocale?) -> [Range<Index>] {
         var searchRange = range ?? Range(start: startIndex, end: endIndex)
-        var searchStartIndex = searchRange.startIndex
-        let searchEndIndex = searchRange.endIndex
         var ranges:[Range<Index>] = []
-        while searchStartIndex < searchEndIndex {
-            if let newRange = self.rangeOfString(string,
-                options: options,
-                range: searchRange,
-                locale: locale) {
-                    ranges += [newRange]
-                    searchStartIndex = newRange.endIndex
-                    searchRange.startIndex = newRange.endIndex
-            } else {
-                searchStartIndex = searchEndIndex
-            }
+        while let newRange = self.rangeOfString(string,options: options,range: searchRange,locale: locale) {
+            ranges += [newRange]
+            searchRange.startIndex = newRange.endIndex
         }
         return ranges
+    }
+    
+    func rangesOfString(string:String, options:NSStringCompareOptions, ranges: [Range<Index>], locale: NSLocale?) -> [Range<Index>] {
+        var foundRanges:[Range<Index>] = []
+        for range in ranges {
+            foundRanges += rangesOfString(string, options: options, range: range, locale: locale)
+        }
+        return foundRanges
     }
 }

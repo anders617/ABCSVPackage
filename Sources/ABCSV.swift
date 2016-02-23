@@ -9,7 +9,15 @@
 import Foundation
 import ABMatrices
 
+
 public class ABCSV:CustomStringConvertible {
+    public enum ABCSVQuotingRule {
+        case AllFields
+        case AllTextFields
+        case NecessaryTextFields
+        case None
+    }
+    
     private(set) var content:ABMatrix<ABCSVCell>
     
     private static let defaultValueSeparator = ","
@@ -17,6 +25,7 @@ public class ABCSV:CustomStringConvertible {
     
     public var valueSeparator:String
     public var rowSeparator:String
+    public var quotingRule:ABCSVQuotingRule = .NecessaryTextFields
     
     public var columnCount:Int {
         return content.columnCount
@@ -118,12 +127,29 @@ public class ABCSV:CustomStringConvertible {
         var string = ""
         for rowNum in 0..<content.rowCount {
             for columnNum in 0..<content.columnCount-1 {
-                string += "\(content[rowNum, columnNum].description)\(valueSeparator)"
+                string += "\(applyQuotingRuleToCell(content[rowNum, columnNum]))\(valueSeparator)"
             }
             string += "\(content[rowNum, content.columnCount-1])"
             string += rowSeparator
         }
         return string
+    }
+    
+    private func applyQuotingRuleToCell(cell:ABCSVCell) -> String {
+        switch quotingRule {
+        case .AllFields:
+            return "\"\(cell.description)\""
+        case .AllTextFields:
+            if cell.isText {return "\"\(cell.description)\""}
+            return cell.description
+        case .NecessaryTextFields:
+            let desc = cell.description
+            if cell.isText && (desc.containsString(rowSeparator)||desc.containsString(valueSeparator)) {
+                return "\"\(desc)\""
+            }
+            return cell.description
+        case .None: return cell.description
+        }
     }
     
     public var dataRepresentation:NSData? {

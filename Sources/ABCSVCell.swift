@@ -63,6 +63,13 @@ public enum ABCSVCell:CustomStringConvertible {
         default: return false
         }
     }
+    
+    public var isText:Bool {
+        switch self {
+        case .Text(_): return true
+        default: return false
+        }
+    }
 }
 
 extension ABCSVCell: IntegerLiteralConvertible {

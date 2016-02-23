@@ -144,7 +144,7 @@ public class ABCSV:CustomStringConvertible {
             return cell.description
         case .NecessaryTextFields:
             let desc = cell.description
-            if cell.isText && (desc.containsString(rowSeparator)||desc.containsString(valueSeparator)) {
+            if cell.isText && (desc.containsString(valueSeparator)||desc.containsString(rowSeparator)) {
                 return "\"\(desc)\""
             }
             return cell.description
@@ -268,44 +268,3 @@ extension ABCSV: ABCSVParserDelegate {
         
     }
 }
-
-struct ABCSVParserCollector:ABCSVParserDelegate {
-    private(set) var contents:ABMatrix<ABCSVCell> = ABMatrix(rowCount: 1, columnCount: 1, withValue: nil)
-    private var currentRow:ABVector<ABCSVCell> = [nil]
-    var callback:((ABCSVParserCollector)->())?
-    
-    mutating func csvParserDidStartDocument() {
-        currentRow = [nil]
-    }
-    
-    mutating func csvParser(parser: ABCSVParser, didStartRow row: Int) {
-        
-    }
-    
-    mutating func csvParser(parser:ABCSVParser, didEndRow row:Int, columnCount:Int) {
-        if row == 0 {
-            contents = ABMatrix(rowCount: 1, columnCount: columnCount, withValue: nil)
-            contents[0] = currentRow
-        } else {
-            if currentRow.count == contents.columnCount {
-                contents.appendRow(currentRow)
-            }
-        }
-        currentRow = [nil]
-    }
-    
-    mutating func csvParser(parser: ABCSVParser, foundCell contents: String, row: Int, column: Int) {
-        if column == 0 {
-            currentRow[0] = ABCSVCell(string:contents)
-        } else {
-            currentRow.append(ABCSVCell(string: contents))
-        }
-    }
-    
-    mutating func csvParserDidEndDocument() {
-        if let end = callback {
-            end(self)
-        }
-    }
-}
-
